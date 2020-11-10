@@ -69,9 +69,13 @@ class _SignInPageState extends State<SignInPage> {
     }
     if (!mounted) return;
 
-    setState(() {
-      _availableBiometric = availableBiometrics;
-    });
+    if(availableBiometrics.length>0){
+
+    }
+    else{
+      commonMessage(context,"No Biometric Found. Please First Add Biometric.");
+    }
+    _authenticate();
   }
 
   Future<void> _authenticate() async {
