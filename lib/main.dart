@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:login_example/service/service_locator.dart';
 import 'package:login_example/sign_in_page.dart';
 
 void main() {
+  setupLocator();
   runApp(MyApp());
 }
 
@@ -14,10 +16,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Poppins',
       ),
-      home: MyHomePage(),
+      home: SignInPage(),
     );
   }
 }
+/*
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -30,3 +33,4 @@ class _MyHomePageState extends State<MyHomePage> {
     return SignInPage();
   }
 }
+*/

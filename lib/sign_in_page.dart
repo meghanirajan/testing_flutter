@@ -6,6 +6,8 @@ import 'package:login_example/Model/Login_response_request.dart';
 import 'package:login_example/Util/common_widget.dart';
 import 'package:login_example/home_page.dart';
 import 'package:login_example/Util/shar_pref.dart';
+import 'package:login_example/service/local_authentication_service.dart';
+import 'package:login_example/service/service_locator.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -29,97 +31,29 @@ class _SignInPageState extends State<SignInPage> {
 
   GlobalKey<FormState> loginformKey=GlobalKey<FormState>();
 
-
+  final LocalAuthenticationService _localAuth = locator<LocalAuthenticationService>();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print("Hello");
     _login_response_request = Login_response_request(this.context);
-    Shared_Preferences.prefGetBool("FaceLockEnable", false)
-        .then((value) {
-      if(value) {
-        _checkBiometrics();
-      }
-    });
+
   }
 
-
-  Future<void> _checkBiometrics() async {
-    bool canCheckBiometrics;
-    try {
-      canCheckBiometrics = await auth.canCheckBiometrics;
-    } on PlatformException catch (e) {
-      print(e);
-    }
-    if (!mounted) return;
-    if(!canCheckBiometrics){
-      commonMessage(context, "BioMetrics data not available");
-    }
-    else{
-      _getAvailableBiometrics();
-    }
-  }
-
-  Future<void> _getAvailableBiometrics() async {
-    List<BiometricType> availableBiometrics;
-    try {
-      availableBiometrics = await auth.getAvailableBiometrics();
-    } on PlatformException catch (e) {
-      print(e);
-    }
-    if (!mounted) return;
-
-    if(availableBiometrics.length>0){
-
-    }
-    else{
-      commonMessage(context,"No Biometric Found. Please First Add Biometric.");
-    }
-    _authenticate();
-  }
-
-  Future<void> _authenticate() async {
-    bool authenticated = false;
-    try {
-      setState(() {
-        _isAuthenticating = true;
-        authorized = 'Authenticating';
-      });
-      authenticated = await auth.authenticateWithBiometrics(
-          localizedReason: 'Scan your fingerprint to authenticate',
-          useErrorDialogs: true,
-          stickyAuth: true);
-      setState(() {
-        _isAuthenticating = false;
-        authorized = 'Authenticating';
-      });
-    } on PlatformException catch (e) {
-      print(e);
-    }
-    if (!mounted) return;
-
-    if(authenticated){
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-              builder: (context) => HomePage()));
-    }
-    else{
-      commonMessage(context, "You are not authorized with biometric data. Please login with your username and password");
-      _cancelAuthentication();
-    }
-
-    /*final String message = authenticated ? 'Authorized' : 'Not Authorized';
-    setState(() {
-      authorized = message;
-    });*/
-  }
-
-  void _cancelAuthentication() {
-    auth.stopAuthentication();
-  }
 
   @override
   Widget build(BuildContext context) {
+    print("sign in build");
+    Shared_Preferences.prefGetBool("FaceLockEnable", false)
+        .then((value) {
+      print("Hi");
+      if(value) {
+        print("true login Data");
+        //_checkBiometrics();
+        _localAuth.authenticate(context);
+      }
+    });
     return Scaffold(
       body: SafeArea(
         child: ListView(
